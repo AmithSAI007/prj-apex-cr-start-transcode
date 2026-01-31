@@ -169,3 +169,4 @@ jobs:
       PROJECT_ID: ${{ secrets.PROJECT_ID }}
       WORKLOAD_IDENTITY: ${{ secrets.WORKLOAD_IDENTITY }}
       SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+      PROJECT_REGION: ${{ secrets.PROJECT_REGION }}
