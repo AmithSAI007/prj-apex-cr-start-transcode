@@ -17,3 +17,8 @@ variable "trigger_name" {
   type        = string
   default     = "apex-transcoder-storage-trigger"
 }
+
+variable "raw_videos_bucket_name" {
+  description = "The name of the Cloud Storage bucket to monitor for new video uploads."
+  type        = string
+}
