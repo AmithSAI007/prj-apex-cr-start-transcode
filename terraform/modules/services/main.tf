@@ -42,6 +42,7 @@ resource "google_cloud_run_service" "apex_cr_start_transcode" {
             }
           }
         }
+
         env {
           name = "OUTPUT_URI"
           value_from {
