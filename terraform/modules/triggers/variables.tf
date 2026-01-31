@@ -22,3 +22,8 @@ variable "raw_videos_bucket_name" {
   description = "The name of the Cloud Storage bucket to monitor for new video uploads."
   type        = string
 }
+
+variable "service_account_name" {
+  description = "The name of the service account used by the Eventarc trigger."
+  type        = string
+}
