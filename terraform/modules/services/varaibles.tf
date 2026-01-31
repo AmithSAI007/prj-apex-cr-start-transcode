@@ -35,37 +35,31 @@ variable "service_account_name" {
 variable "min_instance_count" {
   description = "The minimum number of instances for the Cloud Run service."
   type        = number
-  default     = 0
 }
 
 variable "max_instance_count" {
   description = "The maximum number of instances for the Cloud Run service."
   type        = number
-  default     = 2
 }
 
 variable "memory_limit" {
   description = "The memory limit for the Cloud Run service."
   type        = string
-  default     = "512Mi"
 }
 
 variable "cpu_limit" {
   description = "The CPU limit for the Cloud Run service."
   type        = string
-  default     = "1"
 }
 
 variable "app_env" {
   description = "The application environment variable."
   type        = string
-  default     = "production"
 }
 
 variable "http_port" {
   description = "The HTTP port for the Cloud Run service."
   type        = string
-  default     = "8080"
 }
 
 variable "template_id_secret_name" {

@@ -16,12 +16,6 @@ variable "project_region" {
   }
 }
 
-variable "service_name" {
-  description = "The name of the Cloud Run service."
-  type        = string
-  default     = "apex-cr-start-transcode"
-}
-
 variable "container_image" {
   description = "The container image to be used for the Cloud Run service."
   type        = string
@@ -31,6 +25,7 @@ variable "container_image" {
 variable "service_account_name" {
   description = "The service account name to be used by the Cloud Run service."
   type        = string
+  default     = "prj-apex-cr-start-transcode-sa"
 }
 
 variable "min_instance_count" {
@@ -60,7 +55,7 @@ variable "cpu_limit" {
 variable "app_env" {
   description = "The application environment variable."
   type        = string
-  default     = "production"
+  default     = "development"
 }
 
 variable "http_port" {
@@ -72,19 +67,23 @@ variable "http_port" {
 variable "template_id_secret_name" {
   description = "The name of the secret containing the template ID."
   type        = string
+  default     = "prj-apex-transcode-templates"
 }
 
 variable "template_id_secret_key" {
   description = "The key within the secret that contains the template ID."
   type        = string
+  default     = "TEMPLATE_ID"
 }
 
 variable "output_uri_secret_name" {
   description = "The name of the secret containing the output URI."
   type        = string
+  default     = "prj-apex-transcode-output-uri"
 }
 
 variable "output_uri_secret_key" {
   description = "The key within the secret that contains the output URI."
   type        = string
+  default     = "OUTPUT_URI"
 }
