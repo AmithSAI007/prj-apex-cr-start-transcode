@@ -62,18 +62,8 @@ variable "http_port" {
   type        = string
 }
 
-variable "template_id_secret_name" {
-  description = "The name of the secret containing the template ID."
-  type        = string
-}
-
 variable "template_id_secret_key" {
   description = "The key within the secret that contains the template ID."
-  type        = string
-}
-
-variable "output_uri_secret_name" {
-  description = "The name of the secret containing the output URI."
   type        = string
 }
 
