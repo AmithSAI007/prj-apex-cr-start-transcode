@@ -156,10 +156,8 @@ jobs:
           SHA_TAG="$PROJECT_REGION-docker.pkg.dev/$GCP_PROJECT_ID/prj-apex-artifact-registry/${IMAGE_NAME}:${{ github.sha }}"
           LATEST_TAG="$PROJECT_REGION-docker.pkg.dev/$GCP_PROJECT_ID/prj-apex-artifact-registry/${IMAGE_NAME}:latest"
 
-          # Build ONCE, tag TWICE
           docker build -t $SHA_TAG -t $LATEST_TAG .
 
-          # Push BOTH tags
           docker push $SHA_TAG
           docker push $LATEST_TAG
   call-reusable-terraform:
