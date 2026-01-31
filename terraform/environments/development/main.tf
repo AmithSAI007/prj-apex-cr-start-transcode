@@ -14,8 +14,13 @@ module "cloud_run_service" {
   output_uri_secret_key  = var.output_uri_secret_key
 }
 
+module "storage" {
+  source = "../../modules/storage"
+}
+
 module "eventarc_trigger" {
-  source         = "../../modules/triggers"
-  project_region = var.project_region
-  service_name   = module.cloud_run_service.trancoder_service_name
+  source                 = "../../modules/triggers"
+  project_region         = var.project_region
+  service_name           = module.cloud_run_service.trancoder_service_name
+  raw_videos_bucket_name = module.storage.raw_videos_bucket_name
 }
