@@ -1,5 +1,5 @@
 module "cloud_run_service" {
-  source                  = "./modules/cloud_run_service"
+  source                  = "../../modules/services"
   service_name            = var.service_name
   project_region          = var.project_region
   min_instance_count      = var.min_instance_count
