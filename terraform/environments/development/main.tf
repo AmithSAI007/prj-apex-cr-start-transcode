@@ -13,3 +13,10 @@ module "cloud_run_service" {
   template_id_secret_key = var.template_id_secret_key
   output_uri_secret_key  = var.output_uri_secret_key
 }
+
+module "eventarc_trigger" {
+  source         = "../../modules/eventarc_trigger"
+  project_region = var.project_region
+  trigger_name   = var.trigger_name
+  service_name   = module.cloud_run_service.service_name
+}
