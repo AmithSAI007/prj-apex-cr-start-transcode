@@ -1,0 +1,169 @@
+name: Deploy Cloud Function
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target Environment"
+        required: true
+        default: "development"
+        type: choice
+        options:
+          - development
+          - production
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GO_VERSION: "1.25"
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  determine_environment:
+    name: "Determine Environment"
+    runs-on: ubuntu-24.04
+    outputs:
+      environment: ${{ steps.get_env.outputs.environment }}
+      dir: ${{ steps.get_env.outputs.dir }}
+    steps:
+      - id: get_env
+        name: Set environment for this workflow run
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "environment=development" >> $GITHUB_OUTPUT
+            echo "dir=./terraform/environments/development" >> $GITHUB_OUTPUT
+          else
+            ENVIRONMENT="${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'development') }}"
+            echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
+            echo "dir=./terraform/environments/$ENVIRONMENT" >> $GITHUB_OUTPUT
+          fi
+
+  lint:
+    name: Linting
+    runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.6
+          cache-invalidation-interval: 15
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          go test ./... -v -coverprofile=coverage.out
+
+  security_scan:
+    name: Security Scan
+    runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run security scan
+        uses: aquasecurity/trivy-action@v1
+        with:
+          scan-type: "fs"
+          severity: "CRITICAL,HIGH,MEDIUM"
+
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: "-no-fail -fmt sarif -out results.sarif ./..."
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: results.sarif
+
+  build-and-push:
+    name: Build image and push
+    needs: [determine_environment, lint, test, security_scan]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v3"
+        with:
+          version: ">= 363.0.0"
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Configure Docker for GCP Artifact Registry
+        run: |
+          PROJECT_REGION=${{ secrets.GCP_PROJECT_REGION }}
+          gcloud auth configure-docker $PROJECT_REGION-docker.pkg.dev
+
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE_NAME=${{ secrets.IMAGE_NAME }}
+          PROJECT_REGION=${{ secrets.PROJECT_REGION }}
+          GCP_PROJECT_ID=${{ secrets.PROJECT_ID }}
+          ENVIRONMENT=${{ needs.determine_environment.outputs.environment }}
+          IMAGE_TAG="$PROJECT_REGION-docker.pkg.dev/$GCP_PROJECT_ID/prj-apex-artifact-registry/${IMAGE_NAME}:${{ github.sha }}-$ENVIRONMENT"
+          docker build -t $IMAGE_TAG .
+          docker push $IMAGE_TAG
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "COMMIT_SHA=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+  call-reusable-terraform:
+    name: "Execute Terraform Core Logic"
+    needs: build-and-push
+    uses: AmithSAI007/prj-apex-infrastructure/.github/workflows/reusable-terraform-core.yaml@develop
+    with:
+      environment: ${{ needs.determine_environment.outputs.environment }}
+      terraform_directory: ${{ needs.determine_environment.outputs.dir }}
+      is_pull_request: ${{ github.event_name == 'pull_request' }}
+    secrets: inherit

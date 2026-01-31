@@ -1,0 +1,6 @@
+APP_ENV: "development"
+HTTP_PORT: 8080
+PROJECT_ID: "amith-testing"
+LOCATION: "asia-south1"
+TEMPLATE_ID: "apex-transcoder-job-template"
+OUTPUT_URI: "apex-dev-gcs-processed-videos"
