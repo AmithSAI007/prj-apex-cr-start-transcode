@@ -7,7 +7,7 @@ resource "google_eventarc_trigger" "storage_trigger" {
   }
   matching_criteria {
     attribute = "bucket"
-    value     = google_storage_bucket.default.name
+    value     = var.raw_videos_bucket_name
   }
 
   destination {
