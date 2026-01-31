@@ -25,6 +25,7 @@ variable "service_name" {
 variable "container_image" {
   description = "The container image to be used for the Cloud Run service."
   type        = string
+  default     = "asia-south1-docker.pkg.dev/amith-testing/prj-apex-artifact-registry/prj-apex-cr-start-transcode:latest"
 }
 
 variable "service_account_name" {

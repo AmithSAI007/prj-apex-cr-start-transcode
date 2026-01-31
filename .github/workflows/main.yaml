@@ -156,8 +156,6 @@ jobs:
           IMAGE_TAG="$PROJECT_REGION-docker.pkg.dev/$GCP_PROJECT_ID/prj-apex-artifact-registry/${IMAGE_NAME}:${{ github.sha }}-$ENVIRONMENT"
           docker build -t $IMAGE_TAG .
           docker push $IMAGE_TAG
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
-          echo "COMMIT_SHA=${{ github.sha }}" >> $GITHUB_OUTPUT
 
   call-reusable-terraform:
     name: "Execute Terraform Core Logic"
@@ -167,4 +165,8 @@ jobs:
       environment: ${{ needs.determine_environment.outputs.environment }}
       terraform_directory: ${{ needs.determine_environment.outputs.dir }}
       is_pull_request: ${{ github.event_name == 'pull_request' }}
-    secrets: inherit
+    secrets:
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      WORKLOAD_IDENTITY: ${{ secrets.WORKLOAD_IDENTITY }}
+      SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+      PROJECT_REGION: ${{ secrets.PROJECT_REGION }}
