@@ -116,6 +116,7 @@ jobs:
     name: Build image and push
     needs: [determine_environment, lint, test, security_scan]
     runs-on: ubuntu-24.04
+    environment: ${{ needs.determine_environment.outputs.environment }}
     permissions:
       contents: read
       id-token: write
