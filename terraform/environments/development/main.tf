@@ -15,8 +15,7 @@ module "cloud_run_service" {
 }
 
 module "eventarc_trigger" {
-  source         = "../../modules/trigger"
+  source         = "../../modules/triggers"
   project_region = var.project_region
-  trigger_name   = var.trigger_name
   service_name   = module.cloud_run_service.service_name
 }
