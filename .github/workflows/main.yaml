@@ -152,11 +152,16 @@ jobs:
           IMAGE_NAME=${{ secrets.IMAGE_NAME }}
           PROJECT_REGION=${{ secrets.PROJECT_REGION }}
           GCP_PROJECT_ID=${{ secrets.PROJECT_ID }}
-          ENVIRONMENT=${{ needs.determine_environment.outputs.environment }}
-          IMAGE_TAG="$PROJECT_REGION-docker.pkg.dev/$GCP_PROJECT_ID/prj-apex-artifact-registry/${IMAGE_NAME}:${{ github.sha }}-$ENVIRONMENT"
-          docker build -t $IMAGE_TAG .
-          docker push $IMAGE_TAG
 
+          SHA_TAG="$PROJECT_REGION-docker.pkg.dev/$GCP_PROJECT_ID/prj-apex-artifact-registry/${IMAGE_NAME}:${{ github.sha }}"
+          LATEST_TAG="$PROJECT_REGION-docker.pkg.dev/$GCP_PROJECT_ID/prj-apex-artifact-registry/${IMAGE_NAME}:latest"
+
+          # Build ONCE, tag TWICE
+          docker build -t $SHA_TAG -t $LATEST_TAG .
+
+          # Push BOTH tags
+          docker push $SHA_TAG
+          docker push $LATEST_TAG
   call-reusable-terraform:
     name: "Execute Terraform Core Logic"
     needs: [determine_environment, lint, test, security_scan, build-and-push]
