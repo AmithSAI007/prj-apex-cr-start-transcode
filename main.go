@@ -67,6 +67,5 @@ func main() {
 	if err := server.Shutdown(shutdownCtx); err != nil {
 		logger.Fatal("server shutdown failed", zap.Error(err))
 	}
-
 	logger.Info("Server gracefully stopped")
 }
