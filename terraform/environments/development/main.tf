@@ -23,6 +23,7 @@ module "storage" {
   source = "../../modules/storage"
 }
 
+
 module "eventarc_trigger" {
   source                 = "../../modules/triggers"
   project_region         = var.project_region
