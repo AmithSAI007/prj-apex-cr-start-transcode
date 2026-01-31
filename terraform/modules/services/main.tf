@@ -37,8 +37,8 @@ resource "google_cloud_run_service" "apex_cr_start_transcode" {
           name = "TEMPLATE_ID"
           value_from {
             secret_key_ref {
-              name = var.template_id_secret_name
-              key  = var.template_id_secret_key
+              name = var.template_id_secret_key
+              key  = "latest"
             }
           }
         }
@@ -46,8 +46,8 @@ resource "google_cloud_run_service" "apex_cr_start_transcode" {
           name = "OUTPUT_URI"
           value_from {
             secret_key_ref {
-              name = var.output_uri_secret_name
-              key  = var.output_uri_secret_key
+              name = var.output_uri_secret_key
+              key  = "latest"
             }
           }
         }
