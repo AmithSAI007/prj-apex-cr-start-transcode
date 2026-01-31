@@ -26,13 +26,21 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize logger: %v", err)
 	}
-	defer logger.Sync()
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			log.Printf("Failed to sync logger: %v", err)
+		}
+	}()
 
 	client, err := transcoder.NewTranscoderClient(context.Background(), logger)
 	if err != nil {
 		logger.Fatal("Failed to create Transcoder client", zap.Error(err))
 	}
-	defer client.Close()
+	defer func() {
+		if err := client.Close(); err != nil {
+			logger.Error("Failed to close Transcoder client", zap.Error(err))
+		}
+	}()
 
 	handler := handler.NewHandler(logger, client, cfg)
 
