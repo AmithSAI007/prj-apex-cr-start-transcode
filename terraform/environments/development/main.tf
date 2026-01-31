@@ -17,5 +17,5 @@ module "cloud_run_service" {
 module "eventarc_trigger" {
   source         = "../../modules/triggers"
   project_region = var.project_region
-  service_name   = module.cloud_run_service.service_name
+  service_name   = module.cloud_run_service.trancoder_service_name
 }
