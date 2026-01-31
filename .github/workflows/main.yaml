@@ -140,11 +140,11 @@ jobs:
         uses: "google-github-actions/setup-gcloud@v3"
         with:
           version: ">= 363.0.0"
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          project_id: ${{ secrets.PROJECT_ID }}
 
       - name: Configure Docker for GCP Artifact Registry
         run: |
-          PROJECT_REGION=${{ secrets.GCP_PROJECT_REGION }}
+          PROJECT_REGION=${{ secrets.PROJECT_REGION }}
           gcloud auth configure-docker $PROJECT_REGION-docker.pkg.dev
 
       - name: Build and Push Docker Image
