@@ -16,6 +16,4 @@ resource "google_eventarc_trigger" "storage_trigger" {
       region  = var.project_region
     }
   }
-
-
 }
