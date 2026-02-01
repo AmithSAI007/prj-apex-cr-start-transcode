@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Config captures runtime settings required for HTTP handling and GCP calls.
 type Config struct {
 	AppEnv     string `mapstructure:"APP_ENV"`
 	HttpPort   string `mapstructure:"HTTP_PORT"`
@@ -16,8 +17,8 @@ type Config struct {
 	OutputURI  string `mapstructure:"OUTPUT_URI"`
 }
 
+// LoadConfig reads configuration from config.yaml and environment variables.
 func LoadConfig(path string) (*Config, error) {
-
 	viper.SetDefault("APP_ENV", "development")
 	viper.SetDefault("HTTP_PORT", "8080")
 	viper.SetDefault("PROJECT_ID", "your-gcp-project-id")

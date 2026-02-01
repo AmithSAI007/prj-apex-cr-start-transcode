@@ -12,11 +12,13 @@ type TranscoderClient interface {
 	TriggerJobFromTemplate(ctx context.Context, projectID, location, templateID, inputURI, outputURI string) (string, error)
 }
 
+// Client implements TranscoderClient using the Google Cloud Transcoder API.
 type Client struct {
 	logger    *zap.Logger
 	gcpClient *transcoder.Client
 }
 
+// NewTranscoderClient creates a Transcoder API client with structured logging.
 func NewTranscoderClient(ctx context.Context, logger *zap.Logger) (*Client, error) {
 	client, err := transcoder.NewClient(ctx)
 	if err != nil {
@@ -36,8 +38,8 @@ func (c *Client) Close() error {
 
 var _ TranscoderClient = (*Client)(nil)
 
+// TriggerJobFromTemplate submits a Transcoder job using the configured template.
 func (c *Client) TriggerJobFromTemplate(ctx context.Context, projectID, location, templateID, inputURI, outputURI string) (string, error) {
-
 	c.logger.Info("Creating transcoding job from template",
 		zap.String("projectID", projectID),
 		zap.String("location", location),
@@ -57,7 +59,7 @@ func (c *Client) TriggerJobFromTemplate(ctx context.Context, projectID, location
 		},
 	}
 
-	job, err := c.gcpClient.CreateJob(context.Background(), req)
+	job, err := c.gcpClient.CreateJob(ctx, req)
 	if err != nil {
 		c.logger.Error("Failed to create transcoding job", zap.Error(err))
 		return "", err

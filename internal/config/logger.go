@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// NewLogger returns a logger tailored for local development or production.
 func NewLogger() (*zap.Logger, error) {
 	var logger *zap.Logger
 	var err error

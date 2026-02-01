@@ -17,6 +17,7 @@ type Stream struct {
 	CodecType string `json:"codec_type"`
 }
 
+// HasAudioTrack inspects a media asset and reports whether an audio stream exists.
 func HasAudioTrack(ctx context.Context, gcsURI string) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
