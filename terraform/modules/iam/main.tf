@@ -2,8 +2,8 @@ data "google_service_account" "eventarc_sa" {
   account_id = var.service_account_name
 }
 
-data "google_projects" "project" {
-  filter = "projectId:${var.project_id}"
+data "google_project" "project" {
+  project_id = var.project_id
 }
 
 locals {
