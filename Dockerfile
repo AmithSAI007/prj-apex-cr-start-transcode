@@ -26,6 +26,7 @@ FROM debian:bookworm-slim
 USER root
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	ca-certificates && \
+	apt-get install -y ffmpeg && \
 	rm -rf /var/lib/apt/lists/*
 
 # Copy the binary to the production image from the builder stage.

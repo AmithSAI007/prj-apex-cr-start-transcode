@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/AmithSAI007/prj-apex-cr-start-transcode.git/internal/config"
+	"github.com/AmithSAI007/prj-apex-cr-start-transcode.git/internal/media"
 	"github.com/AmithSAI007/prj-apex-cr-start-transcode.git/pkg/transcoder"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 )
@@ -62,6 +63,19 @@ func (h *Handler) HandleVideoProcessingEvent(w http.ResponseWriter, r *http.Requ
 	}
 
 	inputURI := fmt.Sprintf("gs://%s/%s", data.Bucket, data.Name)
+
+	hasAudio, err := media.HasAudioTrack(ctx, inputURI)
+	if err != nil {
+		h.logger.Error("Failed to analyze media file", zap.Error(err))
+		http.Error(w, "Failed to analyze media file: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if !hasAudio {
+		h.logger.Info("Media file has no audio track, skipping transcoding", zap.String("inputURI", inputURI))
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
 	jobName, err := h.transcoder.TriggerJobFromTemplate(
 		ctx,
