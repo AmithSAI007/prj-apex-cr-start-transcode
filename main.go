@@ -16,8 +16,8 @@ import (
 	"go.uber.org/zap"
 )
 
+// main loads configuration, initializes dependencies, and starts the HTTP server.
 func main() {
-
 	cfg, err := config.LoadConfig(".")
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
@@ -32,6 +32,11 @@ func main() {
 			log.Printf("Failed to sync logger: %v", err)
 		}
 	}()
+
+	logger.Info("Configuration loaded",
+		zap.String("environment", cfg.AppEnv),
+		zap.String("httpPort", cfg.HttpPort),
+	)
 
 	client, err := transcoder.NewTranscoderClient(context.Background(), logger)
 	if err != nil {

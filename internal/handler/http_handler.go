@@ -14,11 +14,13 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 )
 
+// StorageObjectData represents the payload from a GCS event.
 type StorageObjectData struct {
 	Bucket string `json:"bucket"` // The GCS bucket that contains the object.
 	Name   string `json:"name"`   // The name of the object.
 }
 
+// Handler coordinates CloudEvent parsing and transcoding orchestration.
 type Handler struct {
 	logger     *zap.Logger
 	transcoder transcoder.TranscoderClient
@@ -26,6 +28,7 @@ type Handler struct {
 	client     *storage.StorageClient
 }
 
+// NewHandler wires dependencies for the HTTP handler.
 func NewHandler(logger *zap.Logger,
 	transcoder transcoder.TranscoderClient,
 	cfg *config.Config, client *storage.StorageClient) *Handler {
@@ -37,10 +40,12 @@ func NewHandler(logger *zap.Logger,
 	}
 }
 
+// HandleVideoProcessingEvent receives CloudEvents and starts transcoding jobs when needed.
 func (h *Handler) HandleVideoProcessingEvent(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
+		h.logger.Warn("Rejected non-POST request", zap.String("method", r.Method))
 		http.Error(w, "Expected HTTP POST request with CloudEvent payload", http.StatusMethodNotAllowed)
 		return
 	}
@@ -71,10 +76,14 @@ func (h *Handler) HandleVideoProcessingEvent(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Failed to generate signed URL: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+	h.logger.Info("Signed URL generated for media analysis",
+		zap.String("bucket", data.Bucket),
+		zap.String("object", data.Name),
+	)
 
 	inputURI := fmt.Sprintf("gs://%s/%s", data.Bucket, data.Name)
 
-	h.logger.Info("Processing media file", zap.String("httpUri", httpUri), zap.String("inputURI", inputURI))
+	h.logger.Info("Processing media file", zap.String("inputURI", inputURI))
 
 	hasAudio, err := media.HasAudioTrack(ctx, httpUri)
 	if err != nil {
