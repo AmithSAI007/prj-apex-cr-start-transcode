@@ -81,6 +81,10 @@ func (h *Handler) HandleVideoProcessingEvent(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Failed to generate signed URL: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+	h.logger.Info("Signed URL generated for media analysis",
+		zap.String("bucket", data.Bucket),
+		zap.String("object", data.Name),
+	)
 
 	inputURI := fmt.Sprintf("gs://%s/%s", data.Bucket, data.Name)
 
