@@ -17,7 +17,6 @@ module "cloud_run_service" {
 module "iam" {
   source               = "../../modules/iam"
   service_account_name = var.service_account_name
-  project_id           = var.project_id
 }
 
 module "storage" {
