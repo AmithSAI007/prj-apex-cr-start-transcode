@@ -50,6 +50,7 @@ func (h *Handler) HandleVideoProcessingEvent(w http.ResponseWriter, r *http.Requ
 	}
 
 	h.logger.Info("Received CloudEvent",
+		zap.Any("event", event),
 		zap.String("id", event.ID()),
 		zap.String("source", event.Source()),
 		zap.String("type", event.Type()),
