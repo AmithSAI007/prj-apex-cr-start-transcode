@@ -35,7 +35,7 @@ func (c *StorageClient) GenerateSignedURL(bucketName, objectName string, validDu
 		Expires: time.Now().Add(time.Duration(validDuration) * time.Second),
 	}
 
-	url, err := storage.SignedURL(bucketName, objectName, opts)
+	url, err := c.client.Bucket(bucketName).SignedURL(objectName, opts)
 	if err != nil {
 		return "", err
 	}
