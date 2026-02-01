@@ -74,6 +74,8 @@ func (h *Handler) HandleVideoProcessingEvent(w http.ResponseWriter, r *http.Requ
 
 	inputURI := fmt.Sprintf("gs://%s/%s", data.Bucket, data.Name)
 
+	h.logger.Info("Processing media file", zap.String("httpUri", httpUri), zap.String("inputURI", inputURI))
+
 	hasAudio, err := media.HasAudioTrack(ctx, httpUri)
 	if err != nil {
 		h.logger.Error("Failed to analyze media file", zap.Error(err))
