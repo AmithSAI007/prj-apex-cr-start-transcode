@@ -13,14 +13,8 @@ func NewLogger() (*zap.Logger, error) {
 	var err error
 
 	// Check for an environment variable to determine the logging style.
-	if os.Getenv("APP_ENV") == "production" {
-		// Production Logger: JSON format, logs to stdout and a file.
-		cfg := zap.NewProductionConfig()
-		cfg.OutputPaths = []string{"stdout", "app.log"}
-		cfg.ErrorOutputPaths = []string{"stderr", "app.log"}
-		logger, err = cfg.Build()
-	} else {
-		// Development Logger: Human-readable, colorized console output.
+	if os.Getenv("APP_ENV") == "local" {
+		// Local Development Logger: Human-readable, colorized console output.
 		config := zap.NewDevelopmentEncoderConfig()
 
 		// Customize the encoder for better readability.
@@ -32,6 +26,15 @@ func NewLogger() (*zap.Logger, error) {
 			zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), // Write to standard out.
 			zap.InfoLevel, // Log all levels from Info and above.
 		))
+
+	} else {
+
+		// Production Logger: JSON format, logs to stdout and a file.
+		cfg := zap.NewProductionConfig()
+		cfg.OutputPaths = []string{"stdout", "app.log"}
+		cfg.ErrorOutputPaths = []string{"stderr", "app.log"}
+		logger, err = cfg.Build()
+
 	}
 
 	if err != nil {
