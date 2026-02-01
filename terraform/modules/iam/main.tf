@@ -7,7 +7,7 @@ data "google_projects" "project" {
 }
 
 locals {
-  project_number = data.google_projects.project.projects[0].project_number
+  project_number = data.google_project.project.number
   gcs_sa_email   = "service-${local.project_number}@gcp-sa-cloud-storage.iam.gserviceaccount.com"
 }
 
