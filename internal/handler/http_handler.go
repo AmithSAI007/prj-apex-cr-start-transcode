@@ -23,7 +23,7 @@ type Handler struct {
 	logger     *zap.Logger
 	transcoder transcoder.TranscoderClient
 	cfg        *config.Config
-	client *storage.StorageClient
+	client     *storage.StorageClient
 }
 
 func NewHandler(logger *zap.Logger,
@@ -33,7 +33,7 @@ func NewHandler(logger *zap.Logger,
 		logger:     logger,
 		transcoder: transcoder,
 		cfg:        cfg,
-		client: client,
+		client:     client,
 	}
 }
 
@@ -65,14 +65,12 @@ func (h *Handler) HandleVideoProcessingEvent(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-
-	httpUri, err := .GenerateSignedURL(data.Bucket, data.Name, 3600)
+	httpUri, err := h.client.GenerateSignedURL(data.Bucket, data.Name, 3600)
 	if err != nil {
 		h.logger.Error("Failed to generate signed URL", zap.Error(err))
 		http.Error(w, "Failed to generate signed URL: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 
 	inputURI := fmt.Sprintf("gs://%s/%s", data.Bucket, data.Name)
 
