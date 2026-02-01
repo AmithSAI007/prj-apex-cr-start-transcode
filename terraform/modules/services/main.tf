@@ -34,6 +34,10 @@ resource "google_cloud_run_service" "apex_cr_start_transcode" {
           value = var.project_id
         }
         env {
+          name  = "LOCATION"
+          value = var.project_region
+        }
+        env {
           name = "TEMPLATE_ID"
           value_from {
             secret_key_ref {
