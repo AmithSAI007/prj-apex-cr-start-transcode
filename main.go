@@ -11,6 +11,7 @@ import (
 
 	"github.com/AmithSAI007/prj-apex-cr-start-transcode.git/internal/config"
 	"github.com/AmithSAI007/prj-apex-cr-start-transcode.git/internal/handler"
+	"github.com/AmithSAI007/prj-apex-cr-start-transcode.git/internal/storage"
 	"github.com/AmithSAI007/prj-apex-cr-start-transcode.git/pkg/transcoder"
 	"go.uber.org/zap"
 )
@@ -42,7 +43,17 @@ func main() {
 		}
 	}()
 
-	handler := handler.NewHandler(logger, client, cfg)
+	gcsClient, err := storage.NewStorageClient(context.Background(), logger)
+	if err != nil {
+		logger.Fatal("Failed to create Storage client", zap.Error(err))
+	}
+	defer func() {
+		if err := gcsClient.Close(); err != nil {
+			logger.Error("Failed to close Storage client", zap.Error(err))
+		}
+	}()
+
+	handler := handler.NewHandler(logger, client, cfg, gcsClient)
 
 	server := &http.Server{
 		Addr:    ":" + cfg.HttpPort,
