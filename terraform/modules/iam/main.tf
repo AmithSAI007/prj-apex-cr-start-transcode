@@ -8,7 +8,7 @@ data "google_project" "project" {
 
 locals {
   project_number = data.google_project.project.number
-  gcs_sa_email   = "service-${local.project_number}@gcp-sa-cloud-storage.iam.gserviceaccount.com"
+  gcs_sa_email   = "service-${local.project_number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
 
 resource "google_project_iam_member" "gcs_pubsub_publisher" {
