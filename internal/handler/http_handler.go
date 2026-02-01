@@ -70,11 +70,6 @@ func (h *Handler) HandleVideoProcessingEvent(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	h.logger.Info("Preparing media analysis request",
-		zap.String("bucket", data.Bucket),
-		zap.String("object", data.Name),
-	)
-
 	httpUri, err := h.client.GenerateSignedURL(data.Bucket, data.Name, 5)
 	if err != nil {
 		h.logger.Error("Failed to generate signed URL", zap.Error(err))
