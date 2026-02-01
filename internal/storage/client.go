@@ -32,7 +32,7 @@ func (c *StorageClient) GenerateSignedURL(bucketName, objectName string, validDu
 	opts := &storage.SignedURLOptions{
 		Scheme:  storage.SigningSchemeV4,
 		Method:  "GET",
-		Expires: time.Now().Add(time.Duration(validDuration) * time.Second),
+		Expires: time.Now().Add(time.Duration(validDuration) * time.Minute),
 	}
 
 	url, err := c.client.Bucket(bucketName).SignedURL(objectName, opts)

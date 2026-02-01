@@ -65,7 +65,7 @@ func (h *Handler) HandleVideoProcessingEvent(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	httpUri, err := h.client.GenerateSignedURL(data.Bucket, data.Name, 3600)
+	httpUri, err := h.client.GenerateSignedURL(data.Bucket, data.Name, 5)
 	if err != nil {
 		h.logger.Error("Failed to generate signed URL", zap.Error(err))
 		http.Error(w, "Failed to generate signed URL: "+err.Error(), http.StatusInternalServerError)
