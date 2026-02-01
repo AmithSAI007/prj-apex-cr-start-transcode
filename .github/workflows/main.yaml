@@ -150,6 +150,7 @@ jobs:
           gcloud auth configure-docker $PROJECT_REGION-docker.pkg.dev
 
       - name: Build and Push Docker Image
+        id: build_step
         run: |
           IMAGE_NAME=${{ secrets.IMAGE_NAME }}
           PROJECT_REGION=${{ secrets.PROJECT_REGION }}
