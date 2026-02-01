@@ -9,6 +9,7 @@ import (
 
 	"github.com/AmithSAI007/prj-apex-cr-start-transcode.git/internal/config"
 	"github.com/AmithSAI007/prj-apex-cr-start-transcode.git/internal/media"
+	"github.com/AmithSAI007/prj-apex-cr-start-transcode.git/internal/storage"
 	"github.com/AmithSAI007/prj-apex-cr-start-transcode.git/pkg/transcoder"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 )
@@ -22,15 +23,17 @@ type Handler struct {
 	logger     *zap.Logger
 	transcoder transcoder.TranscoderClient
 	cfg        *config.Config
+	client *storage.StorageClient
 }
 
 func NewHandler(logger *zap.Logger,
 	transcoder transcoder.TranscoderClient,
-	cfg *config.Config) *Handler {
+	cfg *config.Config, client *storage.StorageClient) *Handler {
 	return &Handler{
 		logger:     logger,
 		transcoder: transcoder,
 		cfg:        cfg,
+		client: client,
 	}
 }
 
@@ -50,7 +53,6 @@ func (h *Handler) HandleVideoProcessingEvent(w http.ResponseWriter, r *http.Requ
 	}
 
 	h.logger.Info("Received CloudEvent",
-		zap.Any("event", event),
 		zap.String("id", event.ID()),
 		zap.String("source", event.Source()),
 		zap.String("type", event.Type()),
@@ -63,9 +65,18 @@ func (h *Handler) HandleVideoProcessingEvent(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+
+	httpUri, err := .GenerateSignedURL(data.Bucket, data.Name, 3600)
+	if err != nil {
+		h.logger.Error("Failed to generate signed URL", zap.Error(err))
+		http.Error(w, "Failed to generate signed URL: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+
 	inputURI := fmt.Sprintf("gs://%s/%s", data.Bucket, data.Name)
 
-	hasAudio, err := media.HasAudioTrack(ctx, inputURI)
+	hasAudio, err := media.HasAudioTrack(ctx, httpUri)
 	if err != nil {
 		h.logger.Error("Failed to analyze media file", zap.Error(err))
 		http.Error(w, "Failed to analyze media file: "+err.Error(), http.StatusInternalServerError)
