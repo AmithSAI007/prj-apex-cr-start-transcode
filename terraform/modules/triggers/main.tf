@@ -16,6 +16,9 @@ resource "google_eventarc_trigger" "storage_trigger" {
       region  = var.project_region
     }
   }
+  retry_policy {
+    max_attempts = 1
+  }
 
   service_account = var.service_account_name
 }
